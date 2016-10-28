@@ -157,30 +157,33 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	/* starting inotify */
-	inotifyFD = inotify_init();
+	if (fopen(opt_cfg, "r")) {
 
-	wd = inotify_add_watch(inotifyFD, opt_cfg, IN_MODIFY);
-	if (wd == -1) {
-		printf("Error adding watch on: %s\n", opt_cfg);
+		/* starting inotify */
+		inotifyFD = inotify_init();
+
+		wd = inotify_add_watch(inotifyFD, opt_cfg, IN_MODIFY);
+		if (wd == -1) {
+			printf("Error adding watch on: %s\n", opt_cfg);
+			close(inotifyFD);
+			manager_stop();
+			return EXIT_FAILURE;
+		}
+
+		/*Setting gio channel to watch inotify fd*/
+		inotify_io = g_io_channel_unix_new(inotifyFD);
+		watch_id = g_io_add_watch(inotify_io, G_IO_IN,
+			inotify_cb, NULL);
+		g_io_channel_set_close_on_unref(inotify_io, TRUE);
+		g_main_loop_run(main_loop);
+
+		g_source_remove(watch_id);
+		g_io_channel_unref(inotify_io);
+		/*removing from the watch list.*/
+		inotify_rm_watch(inotifyFD, wd);
+		/*closing the INOTIFY instance*/
 		close(inotifyFD);
-		manager_stop();
-		return EXIT_FAILURE;
 	}
-
-	/*Setting gio channel to watch inotify fd*/
-	inotify_io = g_io_channel_unix_new(inotifyFD);
-	watch_id = g_io_add_watch(inotify_io, G_IO_IN, inotify_cb, NULL);
-	g_io_channel_set_close_on_unref(inotify_io, TRUE);
-
-	g_main_loop_run(main_loop);
-
-	g_source_remove(watch_id);
-	g_io_channel_unref(inotify_io);
-	 /*removing from the watch list.*/
-	inotify_rm_watch(inotifyFD, wd);
-	/*closing the INOTIFY instance*/
-	close(inotifyFD);
 
 	manager_stop();
 
