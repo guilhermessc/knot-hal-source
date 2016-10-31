@@ -69,8 +69,7 @@ static int radio_init(const char *spi, uint8_t channel, uint8_t tx_pwr)
 {
 	int retval, fd;
 
-	/* FIXME: pass 'spi' to driver */
-	retval= driver->probe();
+	retval = driver->probe(spi, tx_pwr);
 	if (retval < 0)
 		return retval;
 
@@ -82,7 +81,7 @@ static int radio_init(const char *spi, uint8_t channel, uint8_t tx_pwr)
 	}
 
 	/* Blocking operation: waiting for available nRF24L01 channel */
-	retval = driver->listen(fd);
+	retval = driver->listen(fd, channel);
 	if (retval < 0) {
 		driver->close(fd);
 		driver->remove();
