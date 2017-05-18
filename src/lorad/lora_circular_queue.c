@@ -10,6 +10,57 @@
 
 /* Initializes the sentinels must be called at the begining of the code */
 int lorad_queue_begin(struct lorad_node_set *node_set){
+
+	int i;
+
+	/* Initializing data_tx sentinel */
+	node_set->sentinel_data_tx.type = DATA_TX;
+	node_set->sentinel_data_tx.node_set = node_set;
+	node_set->sentinel_data_tx.tail = 0;
+
+	/* Initinalizing  data_tx sub-node_set */
+	for (i=0; i<LORAD_DATA_TX_SET_SIZE-2; ++i) {
+		node_set->lorad_data_tx_node_set[i].next = i+1;
+	}
+	node_set->lorad_data_tx_node_set[LORAD_DATA_TX_SET_SIZE-1].next = 0;
+
+
+	/* Initializing data_rx sentinel */
+	node_set->sentinel_data_rx.type = DATA_RX;
+	node_set->sentinel_data_rx.node_set = node_set;
+	node_set->sentinel_data_rx.tail = 0;
+
+	/* Initinalizing  data_rx sub-node_set */
+	for (i=0; i<LORAD_DATA_RX_SET_SIZE-2; ++i) {
+		node_set->lorad_data_rx_node_set[i].next = i+1;
+	}
+	node_set->lorad_data_rx_node_set[LORAD_DATA_RX_SET_SIZE-1].next = 0;
+
+
+	/* Initializing mgm_tx sentinel */
+	node_set->sentinel_mgm_tx.type = MGM_TX;
+	node_set->sentinel_mgm_tx.node_set = node_set;
+	node_set->sentinel_mgm_tx.tail = 0;
+
+	/* Initinalizing  mgm_tx sub-node_set */
+	for (i=0; i<LORAD_MGM_TX_SET_SIZE-2; ++i) {
+		node_set->lorad_mgm_tx_node_set[i].next = i+1;
+	}
+	node_set->lorad_mgm_tx_node_set[LORAD_MGM_TX_SET_SIZE-1].next = 0;
+
+
+	/* Initializing mgm_rx sentinel */
+	node_set->sentinel_mgm_rx.type = MGM_RX;
+	node_set->sentinel_mgm_rx.node_set = node_set;
+	node_set->sentinel_mgm_rx.tail = 0;
+
+	/* Initinalizing  mgm_rx sub-node_set */
+	for (i=0; i<LORAD_MGM_RX_SET_SIZE-2; ++i) {
+		node_set->lorad_mgm_rx_node_set[i].next = i+1;
+	}
+	node_set->lorad_mgm_rx_node_set[LORAD_MGM_RX_SET_SIZE-1].next = 0;
+
+
 	return 0;
 }
 
