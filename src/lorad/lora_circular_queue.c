@@ -13,6 +13,9 @@ int lorad_queue_begin(struct lorad_node_set *node_set){
 
 	int i;
 
+	if (node_set == NULL)
+		return -1;
+
 	/* Initializing data_tx sentinel */
 	node_set->sentinel_data_tx.type = DATA_TX;
 	node_set->sentinel_data_tx.node_set = node_set;
@@ -67,6 +70,17 @@ int lorad_queue_begin(struct lorad_node_set *node_set){
 /* Initializes a queue must be called at the declaration of a queue */
 int lorad_init_queue(struct lorad_queue *queue, struct lorad_node_set *node_set,
 	enum lorad_node_type type){
+
+	if(queue == NULL)
+		return -1;
+	if(node_set == NULL)
+		return -1;
+	if(type < DATA_TX || type > MGM_RX)
+		return -1;
+
+	queue->tail = LORAD_EMPTY_QUEUE_FD;
+	queue->node_set = node_set;
+	queue->type = type;
 
 	return 0;
 }
