@@ -289,6 +289,24 @@ int lorad_queue_delete(struct lorad_queue *queue){
 	return 0;
 }
 
-int lorad_queue_peek(struct lorad_queue *queue, uint8_t* peek_buffer){
-	return 0;
+size_t lorad_queue_peek(struct lorad_queue *queue, uint8_t* peek_buffer){
+	
+	struct lorad_node_set *node_subset;
+	lorad_node_fd head_node;
+	size_t max_len = get_queue_data_len(queue);
+
+	if (len == 0)
+		return 0;
+
+	node_subset = get_queue_node_subset(queue);
+	if (node_subset == NULL)
+		return 0;
+
+	/* Get the queue's head */
+	head_node = node_subset[queue->tail].next;
+
+	/* Get head data */
+	memcpy(peek_buffer, node_subset[head_node].data, max_len);
+
+	return max_len;
 }

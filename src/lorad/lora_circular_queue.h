@@ -108,4 +108,5 @@ int lorad_close_queue(struct lorad_queue *queue);
 /* Queue modifying functions */
 int lorad_queue_insert(struct lorad_queue *queue, uint8_t* data);
 int lorad_queue_delete(struct lorad_queue *queue);
-int lorad_queue_peek(struct lorad_queue *queue, uint8_t* peek_buffer);
+/* Returns the buffer length */
+size_t lorad_queue_peek(struct lorad_queue *queue, uint8_t* peek_buffer);
