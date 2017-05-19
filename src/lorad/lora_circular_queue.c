@@ -92,7 +92,18 @@ int lorad_init_queue(struct lorad_queue *queue, struct lorad_node_set *node_set,
  * the nodes avaliable again at the NODE_SET
  */
 int lorad_close_queue(struct lorad_queue *queue){
-	return 0;
+
+	int err = 0;
+
+	/* Check if queue was properely initialized */
+	if(queue->node_set == NULL)
+		return -1;
+
+	while (queue->tail != LORAD_EMPTY_QUEUE_FD && err == 0) {
+		err = lorad_queue_delete(queue);
+	}
+
+	return err;
 }
 
 static struct *lorad_data_node get_queue_node_subset (struct lorad_queue *queue) {
