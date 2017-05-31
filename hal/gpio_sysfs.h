@@ -15,6 +15,13 @@
 extern "C" {
 #endif
 
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
 #define INPUT 0
 #define OUTPUT 1
 

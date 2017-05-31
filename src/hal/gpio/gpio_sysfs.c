@@ -9,6 +9,50 @@
 
 #include "hal/gpio_sysfs.h"
 
+#define BUFFER_MAX 3
+#define DIRECTION_MAX 35
+
+static int GPIOExport(int pin)
+{
+	char buffer[BUFFER_MAX];
+	ssize_t bytes_written;
+	int fd;
+
+	fd = open("/sys/class/gpio/export", O_WRONLY);
+	if (-1 == fd) {
+		fprintf(stderr, "Failed to open export for writing!\n");
+		return -1;
+	}
+
+	bytes_written = snprintf(buffer, BUFFER_MAX, "%d", pin);
+	write(fd, buffer, bytes_written);
+	close(fd);
+	return 0;
+}
+
+static int GPIODirection(int pin, int dir)
+{
+	static const char s_directions_str[]  = "in\0out";
+
+	char path[DIRECTION_MAX];
+	int fd;
+
+	snprintf(path, DIRECTION_MAX, "/sys/class/gpio/gpio%d/direction", pin);
+	fd = open(path, O_WRONLY);
+	if (-1 == fd) {
+		fprintf(stderr, "Failed to open gpio direction for writing!\n");
+		return -1;
+	}
+
+	if (-1 == write(fd, &s_directions_str[INPUT == dir ? 0 : 3], INPUT == dir ? 2 : 3)) {
+		fprintf(stderr, "Failed to set direction!\n");
+		return -1;
+	}
+
+	close(fd);
+	return 0;
+}
+
 int hal_gpio_setup(void)
 {
 	return 0;
@@ -19,9 +63,10 @@ void hal_gpio_unmap(void)
 
 }
 
-void hal_gpio_pin_mode(uint8_t, uint8_t)
+void hal_gpio_pin_mode(uint8_t gpio, uint8_t mode)
 {
-
+	GPIOExport((int) gpio);
+	GPIODirection((int) gpio, (int) mode);
 }
 
 void hal_gpio_digital_write(uint8_t, uint8_t)
