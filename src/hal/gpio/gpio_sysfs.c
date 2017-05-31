@@ -11,6 +11,11 @@
 
 #define BUFFER_MAX 3
 #define DIRECTION_MAX 35
+#define VALUE_MAX 30
+#define HIGHEST_GPIO 26;
+
+static uint8_t initialized_gpio[HIGHEST_GPIO];
+static int ngpio = 0;
 
 static int GPIOExport(int pin)
 {
@@ -21,6 +26,24 @@ static int GPIOExport(int pin)
 	fd = open("/sys/class/gpio/export", O_WRONLY);
 	if (-1 == fd) {
 		fprintf(stderr, "Failed to open export for writing!\n");
+		return -1;
+	}
+
+	bytes_written = snprintf(buffer, BUFFER_MAX, "%d", pin);
+	write(fd, buffer, bytes_written);
+	close(fd);
+	return 0;
+}
+
+static int GPIOUnexport(int pin)
+{
+	char buffer[BUFFER_MAX];
+	ssize_t bytes_written;
+	int fd;
+
+	fd = open("/sys/class/gpio/unexport", O_WRONLY);
+	if (-1 == fd) {
+		fprintf(stderr, "Failed to open unexport for writing!\n");
 		return -1;
 	}
 
@@ -44,7 +67,8 @@ static int GPIODirection(int pin, int dir)
 		return -1;
 	}
 
-	if (-1 == write(fd, &s_directions_str[INPUT == dir ? 0 : 3], INPUT == dir ? 2 : 3)) {
+	if (-1 == write(fd, &s_directions_str[INPUT == dir ? 0 : 3],
+		INPUT == dir ? 2 : 3)) {
 		fprintf(stderr, "Failed to set direction!\n");
 		return -1;
 	}
@@ -55,17 +79,26 @@ static int GPIODirection(int pin, int dir)
 
 int hal_gpio_setup(void)
 {
+	ngpio = 0;
 	return 0;
 }
 
 void hal_gpio_unmap(void)
 {
-
+	while (ngpio)
+		GPIOUnexport((int) initialized_gpio[--ngpio]);
 }
 
 void hal_gpio_pin_mode(uint8_t gpio, uint8_t mode)
 {
-	GPIOExport((int) gpio);
+	if (ngpio > HIGHEST_GPIO) {
+		fprintf(stderr, "Cannot initialize gpio: maximum number exceeded\n");
+		return;
+	}
+
+	if (GPIOExport((int) gpio) == 0)
+		initialized_gpio[ngpio++] = gpio;
+
 	GPIODirection((int) gpio, (int) mode);
 }
 
