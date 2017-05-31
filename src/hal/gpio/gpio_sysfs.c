@@ -77,6 +77,29 @@ static int GPIODirection(int pin, int dir)
 	return 0;
 }
 
+static int GPIOWrite(int pin, int value)
+{
+	static const char s_values_str[] = "01";
+
+	char path[VALUE_MAX];
+	int fd;
+
+	snprintf(path, VALUE_MAX, "/sys/class/gpio/gpio%d/value", pin);
+	fd = open(path, O_WRONLY);
+	if (-1 == fd) {
+		fprintf(stderr, "Failed to open gpio value for writing!\n");
+		return -1;
+	}
+
+	if (1 != write(fd, &s_values_str[LOW == value ? 0 : 1], 1)) {
+		fprintf(stderr, "Failed to write value!\n");
+		return -1;
+	}
+
+	close(fd);
+	return 0;
+}
+
 int hal_gpio_setup(void)
 {
 	ngpio = 0;
@@ -102,9 +125,9 @@ void hal_gpio_pin_mode(uint8_t gpio, uint8_t mode)
 	GPIODirection((int) gpio, (int) mode);
 }
 
-void hal_gpio_digital_write(uint8_t, uint8_t)
+void hal_gpio_digital_write(uint8_t gpio, uint8_t value)
 {
-
+	GPIOWrite(gpio, value);
 }
 
 int hal_gpio_digital_read(uint8_t)
