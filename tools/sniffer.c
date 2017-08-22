@@ -26,7 +26,6 @@ static int cli_fd;
 static int quit;
 
 static int CHANNEL_MGMT = 76;			/* Beacon/Broadcast channel */
-static int CHANNEL_RAW = 10;			/* Connection/Device channel */
 static int channel;
 static struct addr_pipe adrrp;
 static char *option_mac = NULL;
@@ -203,12 +202,6 @@ static int sniffer_run(void)
 	}
 
 	return 0;
-}
-
-static void sniffer_stop(void)
-{
-	if (cli_fd >= 0)
-		phy_close(cli_fd);
 }
 
 static GOptionEntry options[] = {
