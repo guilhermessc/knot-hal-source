@@ -17,6 +17,7 @@
 #include "spi.h"
 
 #define CE	25
+#define IRQ	24
 
 #define LOW	0
 #define HIGH	1
@@ -99,6 +100,9 @@ int io_setup(const char *dev)
 	GPIO_CLR = (1<<CE);
 	INP_GPIO(CE);
 	OUT_GPIO(CE);
+
+	GPIO_CLR = (1<<IRQ);
+	INP_GPIO(IRQ);
 
 	disable();
 	return spi_init(dev);
