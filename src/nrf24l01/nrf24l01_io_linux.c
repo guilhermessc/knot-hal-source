@@ -97,6 +97,6 @@ int io_setup(const char *dev)
 void io_reset(int spi_fd)
 {
 	disable();
-	munmap((void*)gpio, BLOCK_SIZE);
+	hal_gpio_unmap();
 	spi_deinit(spi_fd);
 }
