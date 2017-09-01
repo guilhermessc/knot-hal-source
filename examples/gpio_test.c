@@ -14,7 +14,7 @@
 #include <fcntl.h>
 #include <glib.h>
 
-GMainLoop *mainloop;
+GMainLoop * mainloop;
 
 #define INPUT_PIN	20
 #define OUTPUT_PIN	16
@@ -395,7 +395,7 @@ int hal_gpio_get_fd(uint8_t gpio, int edge)
 #include <fcntl.h>
 #include <glib.h>
 
-GMainLoop *mainloop;
+GMainLoop * mainloop;
 
 /*
  * In this example we trigger an interrupt by using
@@ -425,7 +425,7 @@ GMainLoop *mainloop;
 
 static void gpio_watch_destroy(gpointer user_data)
 {
-	int fd = *((int*)user_data);
+	int fd = *((int *)user_data);
 
 	close(fd);
 	hal_gpio_unmap();
@@ -440,7 +440,7 @@ static gboolean gpio_watch(GIOChannel *io, GIOCondition cond,
 	gsize rbytes;
 
 	/* MUST clean up the file, you cin simply rewind and read some chars */
-	status_rwnd = g_io_channel_seek_position (io, 0, G_SEEK_SET, &gerr);
+	status_rwnd = g_io_channel_seek_position(io, 0, G_SEEK_SET, &gerr);
 	status_read = g_io_channel_read_chars(io, data_dummy,
 					sizeof(data_dummy)-1, &rbytes, &gerr);
 	/* TODO: Add some safety checks on status after cleaning the file */
