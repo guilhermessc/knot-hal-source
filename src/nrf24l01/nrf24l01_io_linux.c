@@ -51,7 +51,7 @@
 #define GPIO_CLR		*(gpio+10)
 
 /* 0 if LOW, (1<<g) if HIGH */
-#define GET_GPIO(g)		(*(gpio+13) & (1 << g))
+#define GET_GPIO(g)		hal_gpio_digital_read(g)
 
 /*
  * Pull up/pull down followed by pull up/down clock
@@ -73,12 +73,14 @@ void delay_ms(float ms)
 
 void enable(void)
 {
-	GPIO_SET = (1<<CE);
+	// GPIO_SET = (1<<CE);
+	hal_gpio_digital_write(CE, HAL_GPIO_HIGH);
 }
 
 void disable(void)
 {
-	GPIO_CLR = (1<<CE);
+	// GPIO_CLR = (1<<CE);
+	hal_gpio_digital_write(CE, HAL_GPIO_LOW);	
 }
 
 int get_irq_gpio_fd(void)
@@ -88,30 +90,31 @@ int get_irq_gpio_fd(void)
 
 int io_setup(const char *dev)
 {
-	int mem_fd;
+	// int mem_fd;
 
-	mem_fd = open("/dev/mem", O_RDWR|O_SYNC);
+	// mem_fd = open("/dev/mem", O_RDWR|O_SYNC);
 
-	if (mem_fd < 0)
-		return -errno;
+	// if (mem_fd < 0)
+	// 	return -errno;
 
-	gpio = (volatile unsigned *)mmap(NULL, BLOCK_SIZE,
-						PROT_READ | PROT_WRITE,
-						MAP_SHARED, mem_fd, GPIO_BASE);
-	close(mem_fd);
+	// gpio = (volatile unsigned *)mmap(NULL, BLOCK_SIZE,
+	// 					PROT_READ | PROT_WRITE,
+	// 					MAP_SHARED, mem_fd, GPIO_BASE);
+	// close(mem_fd);
 
-	if (gpio == MAP_FAILED)
-		return -errno;
+	// if (gpio == MAP_FAILED)
+	// 	return -errno;
 
-	GPIO_CLR = (1<<CE);
-	INP_GPIO(CE);
-	OUT_GPIO(CE);
+	// GPIO_CLR = (1<<CE);
+	// INP_GPIO(CE);
+	// OUT_GPIO(CE);
 
-	disable();
 
 	hal_gpio_setup();
+	hal_gpio_pin_mode(CE, HAL_GPIO_OUTPUT);
 	hal_gpio_pin_mode(IRQ, HAL_GPIO_INPUT);
 
+	disable();
 	return spi_init(dev);
 }
 
