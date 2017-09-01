@@ -18,6 +18,7 @@
 #include "spi.h"
 
 #define CE	25
+#define IRQ	24
 
 #define BCM2709_RPI2		0x3F000000
 #define BCM2708_RPI		0x20000000
