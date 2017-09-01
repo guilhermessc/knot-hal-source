@@ -439,21 +439,13 @@ static gboolean gpio_watch(GIOChannel *io, GIOCondition cond,
 	GIOStatus status_rwnd, status_read;
 	gsize rbytes;
 
-	if (!(cond & G_IO_PRI))
-	 	return FALSE;
-
 	/* MUST clean up the file, you cin simply rewind and read some chars */
 	status_rwnd = g_io_channel_seek_position (io, 0, G_SEEK_SET, &gerr);
 	status_read = g_io_channel_read_chars(io, data_dummy,
 					sizeof(data_dummy)-1, &rbytes, &gerr);
+	/* TODO: Add some safety checks on status after cleaning the file */
 
-	if (status_rwnd != G_IO_STATUS_NORMAL ||
-		status_read != G_IO_STATUS_NORMAL) {
-		printf("File descriptor clean up failed\n");
-		g_error_free(gerr);
-	} else {
-		printf("Interrupt = %c\n", data_dummy[0]);
-	}
+	printf("Interrupt = %c\n", data_dummy[0]);
 
 	return TRUE;
 }
@@ -480,13 +472,9 @@ int main(int argc, char *argv[])
 	hal_gpio_setup();
 	hal_gpio_pin_mode(OUTPUT_PIN, HAL_GPIO_OUTPUT);
 	hal_gpio_pin_mode(INPUT_PIN, HAL_GPIO_INPUT);
-	
-	fd = hal_gpio_get_fd(INPUT_PIN, EDGE);
 
-	if (fd < 0) {
-		printf("open(): %s(%d)\n", strerror(err), err);
-		return -errno;
-	}
+	fd = hal_gpio_get_fd(INPUT_PIN, EDGE);
+	/* TODO: check if fd returned correctly ( > 0) */
 
 	signal(SIGTERM, sig_term);
 	signal(SIGINT, sig_term);
@@ -498,7 +486,11 @@ int main(int argc, char *argv[])
 	g_io_add_watch_full(io, G_PRIORITY_HIGH, cond, gpio_watch, &fd,
 							gpio_watch_destroy);
 	g_io_channel_set_close_on_unref(io, FALSE);
-
+	/*
+	 * Adds a timer to the main loop for tests purposes.
+	 * You may remove this line and also the function tick_tock()
+	 * later, if you want to use this code for any application.
+	 */
 	g_timeout_add_seconds(1, tick_tock, NULL);
 
 	g_main_loop_run(mainloop);
