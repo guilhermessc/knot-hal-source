@@ -7,6 +7,18 @@
  *
  */
 
+/*
+ * HOW TO COMPILE
+ *
+ * To compile this code go to the examples folder
+ * and run the following command (without the '*'):
+ *
+ *	gcc gpio_example.c ../src/hal/gpio/gpio_sysfs.c \
+ *	-I/usr/include/glib-2.0 \
+ *	-I/usr/lib/arm-linux-gnueabihf/glib-2.0/include \
+ *	-lglib-2.0 -o gpio -I..
+ */
+
 #include "../hal/gpio_sysfs.h"
 
 #include <stdio.h>
